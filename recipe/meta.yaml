@@ -8,9 +8,11 @@ package:
 source:
   url: https://github.com/libimobiledevice-win32/getopt/archive/{{ version }}.tar.gz
   sha256: 7e9653ecd58ce4149959bf6a905f4ab2f7889856fe1218afbf84284074f9e549
+  patches:
+    - better_compatibility_with_vs2022.patch
 
 build:
-  number: 0
+  number: 1
   skip: true  # [not win]
   run_exports:
     - {{ pin_subpackage('getopt-win32', max_pin='x.x.x') }}
