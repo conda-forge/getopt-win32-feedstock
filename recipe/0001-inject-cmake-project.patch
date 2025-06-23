@@ -72,7 +72,7 @@ index 0000000..c8f6df2
 +target_include_directories(getopt
 +                           PUBLIC
 +                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-+                            $<INSTALL_INTERFACE:Library/include>
++                            $<INSTALL_INTERFACE:include>
 +                           )
 +
 +target_compile_definitions(getopt PRIVATE EXPORTS_GETOPT _CONSOLE)
