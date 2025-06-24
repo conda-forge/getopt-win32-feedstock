@@ -1,24 +1,35 @@
-From 2a08e61245d685bfb578680459d6ace614fe6a3d Mon Sep 17 00:00:00 2001
+From 95c6e9338fa31f04a0dec0a484dc8cc0f0cf5921 Mon Sep 17 00:00:00 2001
 From: Lindsey Gray <lindsey.gray@gmail.com>
-Date: Fri, 20 Jun 2025 22:19:15 -0500
+Date: Sat, 21 Jun 2025 07:39:57 -0500
 Subject: [PATCH] inject cmake project
 
 ---
- CMakeLists.txt  | 101 ++++++++++++++++++++++++++++++++++++++++++++++++
+ CMakeLists.txt  | 115 ++++++++++++++++++++++++++++++++++++++++++++++++
  Config.cmake.in |   3 ++
- 2 files changed, 104 insertions(+)
+ 2 files changed, 118 insertions(+)
  create mode 100644 CMakeLists.txt
  create mode 100644 Config.cmake.in
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
 new file mode 100644
-index 0000000..c15df47
+index 0000000..c8f6df2
 --- /dev/null
 +++ b/CMakeLists.txt
-@@ -0,0 +1,101 @@
+@@ -0,0 +1,115 @@
 +# List of useful CMake arguments:
 +#  CMAKE_INSTALL_PREFIX=...     path for the installation
 +#                               (can be replaced be cmake --install . -- prefix <patth>)
++
++# In this cmake file we copy a few things from the original .vcxproj for getopt.
++# This is to make sure we aren't accidentally leaving anything out from the
++# original build setup:
++# - We forward the compiler definition _CONSOLE
++#   https://github.com/libimobiledevice-win32/getopt/blob/master/getopt.vcxproj#L83
++# - We set /O2 /Oi /Gy and /W3 specifically
++#   https://github.com/libimobiledevice-win32/getopt/blob/master/getopt.vcxproj#L81
++#   https://github.com/libimobiledevice-win32/getopt/blob/master/getopt.vcxproj#L88
++# Also, to follow the naming in vcpkg, we install this cmake package into conda as:
++# - unofficial-getopt-win32
 +
 +cmake_minimum_required(VERSION 3.10.0...4.0.1)
 +include(CMakePrintHelpers)
@@ -29,7 +40,7 @@ index 0000000..c15df47
 +set(PROJECT_VERSION_PRERELEASE "")
 +include(GNUInstallDirs)
 +
-+#set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
++set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 +
 +#----------------------------------------------------------------------
 +# version information
@@ -64,6 +75,9 @@ index 0000000..c15df47
 +                            $<INSTALL_INTERFACE:include>
 +                           )
 +
++target_compile_definitions(getopt PRIVATE EXPORTS_GETOPT _CONSOLE)
++target_compile_options(getopt PRIVATE /Oi /O2 /W3 /Gy)
++
 +install(FILES getopt.h DESTINATION include)
 +
 +# here we specify that runtime library components (e.g. .dlls, but not .so or .dylib)
@@ -88,34 +102,34 @@ index 0000000..c15df47
 +# allow getopt to work with find_package
 +export(EXPORT getoptTargets
 +  NAMESPACE unofficial::getopt-win32
-+  FILE "${CMAKE_CURRENT_BINARY_DIR}/getoptTargets.cmake"
++  FILE "${CMAKE_CURRENT_BINARY_DIR}/unofficial-getopt-win32Targets.cmake"
 +)
 +
 +install(EXPORT getoptTargets
 +  NAMESPACE unofficial::getopt-win32
-+  FILE getoptTargets.cmake
-+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/getopt
++  FILE unofficial-getopt-win32Targets.cmake
++  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/unofficial-getopt-win32
 +)
 +
 +include(CMakePackageConfigHelpers)
 +
 +configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
-+  "${CMAKE_CURRENT_BINARY_DIR}/getoptConfig.cmake"
-+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/getopt
++  "${CMAKE_CURRENT_BINARY_DIR}/unofficial-getopt-win32Config.cmake"
++  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/unofficial-getopt-win32
 +  NO_SET_AND_CHECK_MACRO
 +  NO_CHECK_REQUIRED_COMPONENTS_MACRO
 +  )
 +
 +write_basic_package_version_file(
-+  "${CMAKE_CURRENT_BINARY_DIR}/getoptConfigVersion.cmake"
++  "${CMAKE_CURRENT_BINARY_DIR}/unofficial-getopt-win32ConfigVersion.cmake"
 +  VERSION "${PROJECT_VERSION}"
 +  COMPATIBILITY AnyNewerVersion
 +  )
 +
 +install(FILES
-+  ${CMAKE_CURRENT_BINARY_DIR}/getoptConfig.cmake
-+  ${CMAKE_CURRENT_BINARY_DIR}/getoptConfigVersion.cmake
-+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/getopt
++  ${CMAKE_CURRENT_BINARY_DIR}/unofficial-getopt-win32Config.cmake
++  ${CMAKE_CURRENT_BINARY_DIR}/unofficial-getopt-win32ConfigVersion.cmake
++  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/unofficial-getopt-win32
 +  )
 diff --git a/Config.cmake.in b/Config.cmake.in
 new file mode 100644
@@ -125,6 +139,6 @@ index 0000000..1e7406f
 @@ -0,0 +1,3 @@
 +@PACKAGE_INIT@
 +
-+include ( "${CMAKE_CURRENT_LIST_DIR}/getoptTargets.cmake" )
--- 
-2.39.5 (Apple Git-154)
++include ( "${CMAKE_CURRENT_LIST_DIR}/unofficial-getopt-win32Targets.cmake" )
+--
+2.49.0

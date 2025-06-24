@@ -18,7 +18,7 @@ source:
     - 0001-inject-cmake-project.patch
 
 build:
-  number: 2
+  number: 3
   skip: not win
   script:
     - cmake %CMAKE_ARGS% -S . -B build
@@ -37,7 +37,7 @@ requirements:
 tests:
   - package_contents:
       files:
-        - Library/lib/cmake/getopt/getopt*.cmake
+        - Library/lib/cmake/unofficial-getopt-win32/unofficial-getopt-win32*.cmake
       include:
         - getopt.h
       lib:
